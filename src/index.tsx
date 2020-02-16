@@ -5,11 +5,24 @@ import './index.css';
 interface SquarePropsInterface {
     value: number;
 }
-class Square extends React.Component<SquarePropsInterface> {
+
+interface SquareStateInterface {
+    value: string;
+}
+class Square extends React.Component<SquarePropsInterface, SquareStateInterface> {
+    constructor(props: SquarePropsInterface) {
+        super(props);
+        this.state = {
+            value: "",
+        };
+    }
    render() {
        return (
-           <button className="square">
-               {this.props.value}
+           <button 
+           className="square" 
+           onClick={() => this.setState({value: 'X'})}
+           >
+               {this.state.value}
            </button>
        );
    }
