@@ -14,17 +14,12 @@ interface BoardStateInterface {
     squares: Array<string>;
 }
 
-class Square extends React.Component<SquarePropsInterface> {
-   render() {
-       return (
-           <button 
-           className="square" 
-           onClick={() => this.props.onClick()}
-           >
-               {this.props.value}
-           </button>
-       );
-   }
+function Square(props: SquarePropsInterface) {
+    return (
+        <button className="square" onClick={props.onClick}>
+            {props.value}
+        </button>
+    );
 }
 
 class Board extends React.Component<BoardPropsInterface, BoardStateInterface> {
