@@ -107,7 +107,6 @@ class Game extends React.Component<GamePropsInterface, GameStateInterface> {
     }
     jumpTo(step: number) {
         this.setState({
-            history: this.state.history.slice(0, step + 1),
             stepNumber: step,
             xIsNext: (step % 2) === 0,
         })
@@ -126,14 +125,24 @@ class Game extends React.Component<GamePropsInterface, GameStateInterface> {
            } else {
                desc = 'Go to step #' + (step+1) + '(' + (h.col+1) + ',' + (h.row + 1) + ')';
            }
-           return (
+           if (step === this.state.stepNumber) {
+               return (
+               <li key={step}>
+                   <button onClick={() => this.jumpTo(step)}>
+                       <b>
+                            {desc}
+                       </b>
+                   </button>
+               </li>
+           )} else {
+               return (
                <li key={step}>
                    <button onClick={() => this.jumpTo(step)}>
                        {desc}
                    </button>
                </li>
-           )
-       });
+           )}
+        });
 
        let status: string;
        if (winner) {
