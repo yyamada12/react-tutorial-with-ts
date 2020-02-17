@@ -126,21 +126,13 @@ class Game extends React.Component<GamePropsInterface, GameStateInterface> {
           (h.row + 1) +
           ")";
       }
-      if (step === this.state.stepNumber) {
-        return (
-          <li key={step}>
-            <button onClick={() => this.jumpTo(step)}>
-              <b>{desc}</b>
-            </button>
-          </li>
-        );
-      } else {
-        return (
-          <li key={step}>
-            <button onClick={() => this.jumpTo(step)}>{desc}</button>
-          </li>
-        );
-      }
+      return (
+        <li key={step}>
+          <button onClick={() => this.jumpTo(step)}>
+            {step === this.state.stepNumber ? <b>{desc}</b> : desc}
+          </button>
+        </li>
+      );
     });
 
     let status: string;
