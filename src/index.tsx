@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
+import { scryRenderedComponentsWithType } from "react-dom/test-utils";
 
 interface SquarePropsInterface {
   value: string;
@@ -27,6 +28,7 @@ interface GameStateInterface {
   }>;
   xIsNext: boolean;
   stepNumber: number;
+  isMoveOrderReversed: boolean;
 }
 
 function Square(props: SquarePropsInterface) {
@@ -46,27 +48,20 @@ class Board extends React.Component<BoardPropsInterface> {
       />
     );
   }
+  renderBoardRow(i: number) {
+    const rows = [];
+    for (let j = 0; j < 3; j++) {
+      rows.push(this.renderSquare(3 * i + j));
+    }
+    return <div className="board-row">{rows}</div>;
+  }
 
   render() {
-    return (
-      <div>
-        <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
-        </div>
-      </div>
-    );
+    const board = [];
+    for (let j = 0; j < 3; j++) {
+      board.push(this.renderBoardRow(j));
+    }
+    return <div>{board}</div>;
   }
 }
 
@@ -82,7 +77,8 @@ class Game extends React.Component<GamePropsInterface, GameStateInterface> {
         }
       ],
       xIsNext: true,
-      stepNumber: 0
+      stepNumber: 0,
+      isMoveOrderReversed: false
     };
   }
   handleClick(i: number) {
@@ -164,7 +160,20 @@ class Game extends React.Component<GamePropsInterface, GameStateInterface> {
         </div>
         <div className="game-info">
           <div>{status}</div>
-          <ol>{moves}</ol>
+          <button
+            onClick={() =>
+              this.setState({
+                isMoveOrderReversed: !this.state.isMoveOrderReversed
+              })
+            }
+          >
+            reverse order
+          </button>
+          {this.state.isMoveOrderReversed ? (
+            <ol reversed>{moves.reverse()}</ol>
+          ) : (
+            <ol>{moves}</ol>
+          )}
         </div>
       </div>
     );
