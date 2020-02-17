@@ -21,7 +21,11 @@ interface GamePropsInterface {
 }
 
 interface GameStateInterface {
-    history: Array<Array<string>>;
+    history: Array<{
+        squares: Array<string>,
+        row: number,
+        col: number,
+        }>;
     xIsNext: boolean;
     stepNumber: number;
 }
@@ -72,20 +76,31 @@ class Game extends React.Component<GamePropsInterface, GameStateInterface> {
     constructor(props: GamePropsInterface) {
         super(props);
         this.state = {
-            history: [Array(9).fill("")],
+            history: [
+                { 
+                    squares: Array(9).fill(""),
+                    row: 0,
+                    col: 0,
+                }
+            ],
             xIsNext: true,
             stepNumber: 0,
         };
     }
     handleClick(i: number) {
         const history = this.state.history.slice(0, this.state.stepNumber + 1);
-        const current = history[history.length - 1].slice();
-        if(calculateWinner(current) || current[i]) {
+        const current = history[history.length - 1];
+        const squares = current.squares.slice()
+        if(calculateWinner(squares) || squares[i]) {
             return;
         }
-        current[i] = this.state.xIsNext ? 'X' : 'O';
+        squares[i] = this.state.xIsNext ? 'X' : 'O';
         this.setState({
-            history: history.concat([current]),
+            history: history.concat({ 
+                squares: squares,
+                row: i / 3 | 0,
+                col: i % 3,
+                }),
             stepNumber: history.length,
             xIsNext: !this.state.xIsNext
         });
@@ -101,14 +116,15 @@ class Game extends React.Component<GamePropsInterface, GameStateInterface> {
    render() {
        const history = this.state.history;
        const current = history[this.state.stepNumber];
-       const winner = calculateWinner(current);
+       const squares = current.squares;
+       const winner = calculateWinner(squares);
 
-       const moves = history.map((squares, step) => {
+       const moves = history.map((h, step) => {
            let desc: string
            if (step === 0) {
                 desc = 'Go to game start';
            } else {
-               desc = 'Go to step #' + (step+1);
+               desc = 'Go to step #' + (step+1) + '(' + (h.col+1) + ',' + (h.row + 1) + ')';
            }
            return (
                <li key={step}>
@@ -130,7 +146,7 @@ class Game extends React.Component<GamePropsInterface, GameStateInterface> {
            <div className="game">
                <div className="game-board">
                    <Board 
-                    squares={current}
+                    squares={squares}
                     onClick={(i: number) => this.handleClick(i)}
                    />
                </div>
