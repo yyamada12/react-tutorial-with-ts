@@ -5,11 +5,13 @@ import { scryRenderedComponentsWithType } from "react-dom/test-utils";
 
 interface SquarePropsInterface {
   value: string;
+  shouldHighlight: boolean;
   onClick: () => void;
 }
 
 interface BoardPropsInterface {
   squares: Array<string>;
+  line: Array<number>;
   onClick: (i: number) => void;
 }
 
@@ -33,7 +35,10 @@ interface GameStateInterface {
 
 function Square(props: SquarePropsInterface) {
   return (
-    <button className="square" onClick={props.onClick}>
+    <button
+      className={props.shouldHighlight ? `square highlighted` : `square`}
+      onClick={props.onClick}
+    >
       {props.value}
     </button>
   );
@@ -45,6 +50,7 @@ class Board extends React.Component<BoardPropsInterface> {
       <Square
         key={i}
         value={this.props.squares[i]}
+        shouldHighlight={this.props.line.indexOf(i) > -1}
         onClick={() => this.props.onClick(i)}
       />
     );
@@ -90,7 +96,7 @@ class Game extends React.Component<GamePropsInterface, GameStateInterface> {
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
-    if (calculateWinner(squares) || squares[i]) {
+    if (calculateWinner(squares).winner || squares[i]) {
       return;
     }
     squares[i] = this.state.xIsNext ? "X" : "O";
@@ -115,7 +121,7 @@ class Game extends React.Component<GamePropsInterface, GameStateInterface> {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
     const squares = current.squares;
-    const winner = calculateWinner(squares);
+    const { winner, line } = calculateWinner(squares);
 
     const moves = history.map((h, step) => {
       let desc: string;
@@ -152,6 +158,7 @@ class Game extends React.Component<GamePropsInterface, GameStateInterface> {
         <div className="game-board">
           <Board
             squares={squares}
+            line={line}
             onClick={(i: number) => this.handleClick(i)}
           />
         </div>
@@ -181,7 +188,9 @@ class Game extends React.Component<GamePropsInterface, GameStateInterface> {
 
 ReactDOM.render(<Game />, document.getElementById("root"));
 
-function calculateWinner(squares: Array<string>): string {
+function calculateWinner(
+  squares: Array<string>
+): { winner: string; line: Array<number> } {
   const lines = [
     [0, 1, 2],
     [3, 4, 5],
@@ -195,8 +204,8 @@ function calculateWinner(squares: Array<string>): string {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+      return { winner: squares[a], line: lines[i] };
     }
   }
-  return "";
+  return { winner: "", line: [] };
 }
