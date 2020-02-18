@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-import { scryRenderedComponentsWithType } from "react-dom/test-utils";
 
 interface SquarePropsInterface {
   value: string;
@@ -149,8 +148,10 @@ class Game extends React.Component<GamePropsInterface, GameStateInterface> {
     let status: string;
     if (winner) {
       status = "Winnder: " + winner;
-    } else {
+    } else if (history.length < 10) {
       status = "Next player: " + (this.state.xIsNext ? "X" : "O");
+    } else {
+      status = "Draw";
     }
 
     return (
